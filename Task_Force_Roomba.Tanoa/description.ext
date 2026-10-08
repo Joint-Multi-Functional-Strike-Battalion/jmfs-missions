@@ -1,0 +1,79 @@
+/*
+    Task Force Roomba - 1st Joint Multi-Functional Strike Battalion, 2040.
+
+    THE MISSION IS CONFIGURATION, AND THE CONFIGURATION IS THE DATABASE. Roles,
+    the order of battle, arsenals, motorpool, nets, the radio plan, ranks,
+    skills, cosmetics, logistics, pylons, the report deck, tacpad schemes and
+    the welcome text are TAC//PAC documents for unit JMSB in the 1st JMSB's
+    MongoDB (database jmsb), read at boot and edited on https://pac.jmsb.info
+    or in game. There is no config\ folder: this file, the init scripts and
+    mission.sqm are the whole mission. The code is the mod (z\jmfsb).
+
+    THE SERVER NEEDS THE DATABASE STRING. Addon Options > 1st Joint
+    Multi-Functional Strike Battalion PAC > Service, Server tab: Database =
+    the jmsb_pac mongodb+srv:// connection string. Without it the mission
+    boots with no roles, no squads and no arsenal.
+*/
+
+/* ADMINS - the debug console, the CBA settings whitelist and TAC//ADMIN.
+   The engine reads these out of this file before any script runs, so whoever
+   hosts the server has to be named here as well as in <unit>.admins. */
+#define ADMINS \
+    "76561198000002705", /* YonV  */ \
+    "76561198083000561"  /* Wobba */
+
+forceRotorLibSimulation = 0; // 0 player's own option, 1 advanced, 2 basic
+respawnButton = 1;
+respawn = 3;
+skipLobby = 1;
+disabledAI = 1;
+
+/* BRANDING ---------------------------------------------------------------- */
+onLoadName = "1st JMSB - Task Force Roomba";
+onLoadMission = "1st Joint Multi-Functional Strike Battalion";
+author = "YonV";
+loadScreen = "data\task-force-roomba-1024x512.paa";
+overviewPicture = "data\task-force-roomba-1024x512.paa";
+overviewText = "1st Joint Multi-Functional Strike Battalion - 2040";
+
+/* SERVER ------------------------------------------------------------------ */
+enableDebugConsole[] = {ADMINS};
+cba_settings_whitelist[] = {ADMINS};
+
+// htmlLoad whitelist (cTab web tablet). For clients on a dedicated server,
+// restrictions defined in the server's own config have priority.
+class CfgCommands {
+    allowedHTMLLoadURIs[] += {};
+};
+
+/* GARBAGE COLLECTION ------------------------------------------------------ */
+corpseManagerMode = 3;
+corpseLimit = 25;
+corpseRemovalMinTime = 60;
+corpseRemovalMaxTime = 7200;
+minPlayerDistance = 250;
+
+// CfgSounds: sound classnames name audio inside this PBO, so they stay here.
+class CfgSounds {
+    sounds[] = {};
+};
+
+/* TAC//PAC - EVERYTHING FROM THE DATABASE --------------------------------- */
+class CfgGFA_PAC {
+    class settings {
+        unitId   = "JMSB";     // the unit this store belongs to: JMSB.* in the jmsb database
+        serverId = "main";     // this server, for merges across servers
+        sync     = "service";  // read and write the database (connection string: the CBA server setting)
+
+        // Which versions this mission runs. Empty takes the unit default.
+        currentOrbat   = "";
+        currentArsenal = "";
+        currentWelcome = "";
+    };
+};
+
+class CfgDebriefingSections {
+    #if __has_include("\z\ace\addons\killtracker\killtracker.inc")
+        #include "\z\ace\addons\killtracker\killtracker.inc"
+    #endif
+};
